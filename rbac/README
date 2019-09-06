@@ -1,0 +1,140 @@
+权限组件的应用 **
+
+1. 拷贝rbac组件到新项目中，并且注册
+
+2. 迁移数据库
+
+   1. 修改rbac用户表
+
+      ManyToManyField 中 关联写上Role ，不要写字符串
+
+      ```
+      class User(models.Model):
+         """用户表"""
+         # name = models.CharField('用户名', max_length=32)
+         # pwd = models.CharField('密码', max_length=32)
+         roles = models.ManyToManyField(Role, verbose_name='用户所拥有的角色', blank=True)
+
+         class Meta:
+            abstract = True   # 迁移的时候不生成表，继承使用  当基类
+      ```
+
+   2. 已有的用户表继承rbac的User
+
+      ```
+      class UserProfile(User)
+      ```
+
+   3. 执行数据库迁移的命令
+
+      python manage.py  makemigrations
+
+      python  manage.py  migrate
+
+3. 配置上rbac的路由
+
+   ```python
+   url(r'^rbac/',include('rbac.urls',namespace='rbac')),
+   ```
+
+4. 角色管理
+
+   http://127.0.0.1:8001/rbac/role/list/
+
+   添加角色   http://127.0.0.1:8001/rbac/role/add/
+
+5. 菜单管理
+
+   http://127.0.0.1:8001/rbac/menu/list/
+
+   添加菜单 http://127.0.0.1:8001/rbac/menu/add/
+
+6. 批量操作权限
+
+   http://127.0.0.1:8001/rbac/multi/permissions/
+
+   录入权限的标题、分配一级菜单下的二级菜单和子权限
+
+7. 分配权限
+
+   http://127.0.0.1:8001/rbac/distribute/permissions/
+
+   权限分配的视图中  rbac的用户类替换成 使用用户表的类
+
+   添加用户  给用户分配角色  给角色分配权限
+
+8. 应用上权限
+
+   1. 加上权限的中间件
+
+      ```
+      MIDDLEWARE = [
+      	...
+         'rbac.middlewares.rbac.RbacMiddleWare'
+      ]
+      ```
+
+   2. 添加上权限的相关配置
+
+      ```
+      # 权限相关的配置
+
+      # 白名单
+      WHITE_LIST = [
+         r'^/crm/login/$',
+         r'^/crm/reg/$',
+         r'^/admin/.*',
+      ]
+
+      # 免认证的URL地址
+      NO_PERMISSION_LIST = [
+         r'^/crm/index/$',
+      ]
+
+      # 存权限的SESSION KEY
+      PERMISSION_SESSION_KEY = 'permission'
+
+      # 存菜单的SESSION KEY
+      MENU_SESSION_KEY = 'menu'
+      ```
+
+   3. 登录成功权限信息的初始化
+
+      ```Python
+      from rbac.service.init_permission import init_permission
+      认证成功：
+      	# 进行权限信息的初始化（保存权限信息 菜单信息 登录状态）
+          init_permission(request,obj)
+
+      ```
+
+9. 动态生成二级菜单
+
+   ```
+   <div class="menu-body">
+       {% load rbac %}
+       {% menu request %}
+   </div>
+   ```
+
+   加上CSS JS
+
+   ```
+   <link rel="stylesheet" href="{% static 'rbac/css/menu.css' %} "/>
+   <script src="{% static 'rbac/js/menu.js' %} "></script>
+
+   ```
+
+10. 路径导航
+
+    ```
+    {% breadcrumb request %}
+    ```
+
+11. 权限控制到按钮级别
+
+    ```html
+    {% if request|has_permission:'add_class' %}
+        <a class="btn btn-primary" href="{% reverse_url request 'add_class' %}">添加</a>
+    {% endif %}
+    ```

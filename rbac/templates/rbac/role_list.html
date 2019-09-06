@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h3>角色管理</h3>
+    <a class="btn btn-primary btn-sm" href="{% url 'rbac:role_add' %}">添加</a>
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>名称</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for role in all_role %}
+            <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ role.name }}</td>
+            <td>
+                <a href="{% url 'rbac:role_edit' role.pk %}"> <i class="fa fa-edit"></i> </a>
+                <a href="{% url 'rbac:role_del' role.pk %}"> <i class="fa fa-trash-o"></i> </a>
+            </td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+    </table>
+{% endblock %}
