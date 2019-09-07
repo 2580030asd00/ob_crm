@@ -26,6 +26,7 @@ driver = webdriver.Chrome()
 
 driver.get('https://www.baidu.com')
 print(driver.page_source)
+<<<<<<< HEAD
 
 driver.close()
 #eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
@@ -53,3 +54,9 @@ driver.close()
 
 #ssssssssssss
 
+=======
+#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+driver.close()
+>>>>>>> 606f759ae8d6733438c3b9959e4a481bdad123c1
